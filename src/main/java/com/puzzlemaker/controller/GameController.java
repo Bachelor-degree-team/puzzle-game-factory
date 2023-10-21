@@ -1,8 +1,8 @@
 package com.puzzlemaker.controller;
 
 import com.puzzlemaker.service.GameService;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,8 +18,8 @@ import java.util.Optional;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class GameController {
 
-    @NonNull
-    GameService gameService;
+    @NotNull
+    private final GameService gameService;
 
     @GetMapping("/{id}/play")
     public ResponseEntity<List<String>> play(@PathVariable("id") String id) {

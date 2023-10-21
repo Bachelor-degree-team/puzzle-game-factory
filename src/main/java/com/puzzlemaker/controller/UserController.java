@@ -2,8 +2,8 @@ package com.puzzlemaker.controller;
 
 import com.puzzlemaker.model.User;
 import com.puzzlemaker.service.UserService;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,8 +19,8 @@ import java.util.Optional;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class UserController {
 
-    @NonNull
-    private UserService userService;
+    @NotNull
+    private final UserService userService;
 
     @GetMapping("/{login}/games")
     public ResponseEntity<List<String>> getGameIds(@PathVariable("login") String login) {

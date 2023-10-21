@@ -1,11 +1,16 @@
 package com.puzzlemaker.service;
 
 import com.puzzlemaker.model.User;
+import com.puzzlemaker.model.UserRole;
 import com.puzzlemaker.repository.UserRepository;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,12 +19,21 @@ import java.util.Optional;
 @Slf4j
 @Service
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-public class UserService {
+public class UserService implements UserDetailsService {
 
     private static final String TEST_USER_LOGIN = "test";
 
-    @NonNull
+    @NotNull
     private final UserRepository userRepository;
+
+    @NotNull
+    private final BCryptPasswordEncoder passwordEncoder;
+
+    @Override
+    public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
+        return userRepository.findUserByLogin(login)
+                .orElseThrow(() -> new UsernameNotFoundException("There exist no users with login " + login));
+    }
 
     public void populate() {
         if (getTestUser().isPresent()) {
@@ -29,8 +43,11 @@ public class UserService {
 
         User testUser = new User(
                 TEST_USER_LOGIN,
-                "A user for testing purposes",
-                List.of()
+                passwordEncoder.encode("password"),
+                List.of(),
+                UserRole.USER,
+                false,
+                true
         );
 
         userRepository.insert(testUser);
@@ -60,5 +77,9 @@ public class UserService {
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
+    }
+
+    public User addUser(User user) {
+        return userRepository.save(user);
     }
 }

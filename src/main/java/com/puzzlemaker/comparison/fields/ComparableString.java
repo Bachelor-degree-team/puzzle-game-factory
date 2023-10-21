@@ -4,13 +4,13 @@ import com.puzzlemaker.comparison.ComparableField;
 import com.puzzlemaker.comparison.ComparisonResult;
 import com.puzzlemaker.comparison.utils.ComparisonUtils;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
 @RequiredArgsConstructor
 public class ComparableString implements ComparableField<String> {
 
-    @NonNull
+    @NotNull
     @Getter(onMethod_ = @Override)
     private String value;
 
@@ -20,7 +20,7 @@ public class ComparableString implements ComparableField<String> {
             return ComparisonResult.TYPE_MISMATCH;
         }
 
-        @NonNull
+        @NotNull
         ComparableString comparableString = ComparisonUtils.ensureString(comparableField);
 
         if (value.equals(comparableString.getValue())) {

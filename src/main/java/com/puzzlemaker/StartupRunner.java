@@ -3,9 +3,9 @@ package com.puzzlemaker;
 
 import com.puzzlemaker.service.GameService;
 import com.puzzlemaker.service.UserService;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -15,10 +15,10 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class StartupRunner implements CommandLineRunner {
 
-    @NonNull
+    @NotNull
     private final UserService userService;
 
-    @NonNull
+    @NotNull
     private final GameService gameService;
 
     @Override

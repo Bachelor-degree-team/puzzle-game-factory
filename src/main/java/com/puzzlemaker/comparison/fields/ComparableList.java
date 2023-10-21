@@ -4,16 +4,16 @@ import com.puzzlemaker.comparison.ComparableField;
 import com.puzzlemaker.comparison.ComparisonResult;
 import com.puzzlemaker.comparison.utils.ComparisonUtils;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 @RequiredArgsConstructor
 public class ComparableList implements ComparableField<List<String>> {
 
-    @NonNull
+    @NotNull
     @Getter(onMethod_ = @Override)
     private List<String> value;
 
@@ -23,7 +23,7 @@ public class ComparableList implements ComparableField<List<String>> {
             return ComparisonResult.TYPE_MISMATCH;
         }
 
-        @NonNull
+        @NotNull
         ComparableList comparableList = ComparisonUtils.ensureList(comparableField);
 
         if (value.equals(comparableList.getValue())) {
