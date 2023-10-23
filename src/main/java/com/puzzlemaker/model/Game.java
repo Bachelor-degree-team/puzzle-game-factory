@@ -2,7 +2,7 @@ package com.puzzlemaker.model;
 
 import com.puzzlemaker.comparison.ComparableRecord;
 import lombok.Data;
-import lombok.NonNull;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -17,16 +17,16 @@ public class Game {
 
     private final boolean isPublic;
 
-    @NonNull
+    @NotNull
     private String userId;
 
-    @NonNull
+    @NotNull
     private String title;
 
-    @NonNull
+    @NotNull
     private String description;
 
-    @NonNull
+    @NotNull
     private List<ComparableRecord> gameData;
 
 }

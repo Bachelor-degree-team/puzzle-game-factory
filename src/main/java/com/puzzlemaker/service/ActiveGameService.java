@@ -5,9 +5,9 @@ import com.puzzlemaker.model.ActiveGame;
 import com.puzzlemaker.model.Game;
 import com.puzzlemaker.model.factory.ActiveGameFactory;
 import com.puzzlemaker.repository.ActiveGameRepository;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
@@ -22,8 +22,8 @@ public class ActiveGameService {
 
     private static final String NO_GUESS_FOUND = "invalid_guess_name";
 
-    @NonNull
-    ActiveGameRepository activeGameRepository;
+    @NotNull
+    private final ActiveGameRepository activeGameRepository;
 
     public String createActiveGame(Game game) {
         ActiveGame gameToBePlayed = ActiveGameFactory.fromGame(game);

@@ -7,9 +7,9 @@ import com.puzzlemaker.comparison.fields.ComparableString;
 import com.puzzlemaker.model.Game;
 import com.puzzlemaker.model.User;
 import com.puzzlemaker.repository.GameRepository;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,13 +21,13 @@ import java.util.Optional;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class GameService {
 
-    @NonNull
+    @NotNull
     private final GameRepository gameRepository;
 
-    @NonNull
+    @NotNull
     private final UserService userService;
 
-    @NonNull
+    @NotNull
     private final ActiveGameService activeGameService;
 
     public void populate() {

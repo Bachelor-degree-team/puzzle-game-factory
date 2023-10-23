@@ -1,8 +1,8 @@
 package com.puzzlemaker.controller;
 
 import com.puzzlemaker.service.ActiveGameService;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,8 +17,8 @@ import java.util.Map;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class ActiveGameController {
 
-    @NonNull
-    ActiveGameService activeGameService;
+    @NotNull
+    private final ActiveGameService activeGameService;
 
     @GetMapping("/{id}/guess/{name}")
     public ResponseEntity<Map<String, String>> guess(@PathVariable("id") String id, @PathVariable("name") String name) {

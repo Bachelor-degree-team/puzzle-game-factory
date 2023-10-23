@@ -1,12 +1,14 @@
 package com.puzzlemaker.comparison;
 
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.util.Pair;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Getter
@@ -16,13 +18,13 @@ public class ComparableRecord {
     private static final String FIELDS_LENGTH_MISMATCH = "field_length_mismatch";
     private static final String GAME_WON_INDICATOR = "game_won";
 
-    @NonNull
+    @NotNull
     private String name;
 
-    @NonNull
+    @NotNull
     private List<ComparableField<?>> fields;
 
-    public Pair<Map<String, String>, Boolean> compareTo(@NonNull ComparableRecord trueValue) {
+    public Pair<Map<String, String>, Boolean> compareTo(@NotNull ComparableRecord trueValue) {
         if (fields.size() != trueValue.fields.size()) {
             log.warn("Fields size mismatch between guesses {} and {}, this usually shouldn't happen.", name, trueValue.getName());
             return Pair.of(Map.of(FIELDS_LENGTH_MISMATCH, "true"), false);

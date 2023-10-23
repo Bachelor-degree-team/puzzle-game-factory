@@ -2,7 +2,7 @@ package com.puzzlemaker.model;
 
 import com.puzzlemaker.comparison.ComparableRecord;
 import lombok.Data;
-import lombok.NonNull;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -15,13 +15,13 @@ public class ActiveGame {
     @Id
     private String id;
 
-    @NonNull
+    @NotNull
     private String title;
 
-    @NonNull
+    @NotNull
     private ComparableRecord correctGuess;
 
-    @NonNull
+    @NotNull
     private List<ComparableRecord> gameData;
 
 }
