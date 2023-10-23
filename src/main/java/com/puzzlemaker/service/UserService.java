@@ -22,6 +22,7 @@ import java.util.Optional;
 public class UserService implements UserDetailsService {
 
     private static final String TEST_USER_LOGIN = "test";
+    private static final String ADMIN_USER_LOGIN = "admin";
 
     @NotNull
     private final UserRepository userRepository;
@@ -36,6 +37,8 @@ public class UserService implements UserDetailsService {
     }
 
     public void populate() {
+        populateAdminUser();
+
         if (getTestUser().isPresent()) {
             return;
         }
@@ -71,15 +74,37 @@ public class UserService implements UserDetailsService {
         return userRepository.findUserByLogin(login);
     }
 
-    public Optional<User> getTestUser() {
-        return userRepository.findUserByLogin(TEST_USER_LOGIN);
-    }
-
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
     public User addUser(User user) {
         return userRepository.save(user);
+    }
+
+    public Optional<User> getTestUser() {
+        return userRepository.findUserByLogin(TEST_USER_LOGIN);
+    }
+
+    private Optional<User> getAdminUser() {
+        return userRepository.findUserByLogin(ADMIN_USER_LOGIN);
+    }
+
+    private void populateAdminUser() {
+        if (getAdminUser().isPresent()) {
+            return;
+        }
+        log.info("Admin user not detected, inserting admin user.");
+
+        User admin = new User(
+                ADMIN_USER_LOGIN,
+                passwordEncoder.encode("admin"),
+                List.of(),
+                UserRole.ADMIN,
+                false,
+                true
+        );
+
+        userRepository.insert(admin);
     }
 }
