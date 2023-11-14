@@ -7,6 +7,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -72,6 +75,25 @@ public class UserService implements UserDetailsService {
 
     public Optional<User> getUserByLogin(String login) {
         return userRepository.findUserByLogin(login);
+    }
+
+    public Optional<String> getLoggedInUserLogin() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (!(authentication instanceof AnonymousAuthenticationToken)) {
+            return Optional.of(authentication.getName());
+        }
+        return Optional.empty();
+    }
+
+    public Optional<String> getLoggedInUserId() {
+        Optional<String> userLogin = getLoggedInUserLogin();
+        if (userLogin.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return userRepository
+                .findUserByLogin(userLogin.orElseThrow(() -> new IllegalStateException("No login despite being found!")))
+                .map(User::getId);
     }
 
     public List<User> getAllUsers() {

@@ -90,4 +90,24 @@ public class GameService {
 
         return Optional.of(List.of(activeGameService.createActiveGame(game.orElseThrow())));
     }
+
+    public Optional<String> createGame(List<ComparableRecord> gameData, boolean isPublic, String title, String desc) {
+        Optional<String> userLogin = userService.getLoggedInUserId();
+
+        if (userLogin.isEmpty()) {
+            return Optional.empty();
+        }
+
+        Game newGame = new Game(
+                isPublic,
+                userLogin.orElseThrow(() -> new IllegalStateException("No username is present despite being found.")),
+                title,
+                desc,
+                gameData
+        );
+
+        String result = gameRepository.insert(newGame).getId();
+        userService.addGameToUsersCollection(newGame.getUserId(), result);
+        return Optional.of(result);
+    }
 }
