@@ -27,7 +27,21 @@ public class GameController {
         return ResponseEntity.of(activeGameId);
     }
 
-    @GetMapping("/create")
+    @GetMapping("/{id}/ratings/get")
+    public ResponseEntity<Double> getRating(@PathVariable("id") String gameId) {
+        Optional<Double> averageRating = gameService.getGameRatings(gameId);
+        return ResponseEntity.of(averageRating);
+    }
+
+    @PostMapping("/{id}/ratings/{login}/rate/{rating}")
+    public ResponseEntity<String> rate(@PathVariable("id") String gameId,
+                                       @PathVariable("login") String login,
+                                       @PathVariable("rating") Integer rating) {
+        Optional<String> upsertedGameId = gameService.rateGameById(gameId, login, rating);
+        return ResponseEntity.of(upsertedGameId);
+    }
+
+    @PostMapping("/create")
     public ResponseEntity<String> create(@RequestParam MultipartFile csv,
                                          @RequestParam char separator,
                                          @RequestParam boolean isPublic,

@@ -1,6 +1,7 @@
 package com.puzzlemaker.model;
 
 import lombok.Data;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.data.annotation.Id;
@@ -43,6 +44,8 @@ public class User implements UserDetails {
 
     @NotNull
     private Boolean enabled;
+
+    private List<Pair<String, Integer>> scores = List.of();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

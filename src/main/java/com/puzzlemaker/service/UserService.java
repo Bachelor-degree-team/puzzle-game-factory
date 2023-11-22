@@ -5,6 +5,7 @@ import com.puzzlemaker.model.UserRole;
 import com.puzzlemaker.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -37,6 +38,22 @@ public class UserService implements UserDetailsService {
     public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
         return userRepository.findUserByLogin(login)
                 .orElseThrow(() -> new UsernameNotFoundException("There exist no users with login " + login));
+    }
+
+    public boolean addScoreToUser(String login, String gameId, Integer score) {
+        if (score < 1) {
+            log.warn("Trying to add a score that is less than 1! Aborting.");
+            return false;
+        }
+
+        getUserByLogin(login).ifPresentOrElse(
+                user -> {
+                    user.getScores().add(Pair.of(gameId, score));
+                    userRepository.save(user);
+                },
+                () -> log.warn("The user by the login {} does not exist, cannot add a score", login)
+        );
+        return true;
     }
 
     public void populate() {
@@ -96,6 +113,20 @@ public class UserService implements UserDetailsService {
                 .map(User::getId);
     }
 
+    public Optional<String> setUserLocked(String login, Boolean locked) {
+        Optional<User> userOptional = getUserByLogin(login);
+
+        if (userOptional.isEmpty()) {
+            log.warn("There is no user by login {}, cannot block", login);
+            return Optional.empty();
+        }
+
+        User user = userOptional.orElseThrow(() -> new IllegalStateException("User not present despite being found."));
+
+        user.setLocked(locked);
+        return Optional.of(userRepository.save(user).getId());
+    }
+
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
@@ -120,7 +151,7 @@ public class UserService implements UserDetailsService {
 
         User admin = new User(
                 ADMIN_USER_LOGIN,
-                passwordEncoder.encode("admin"),
+                passwordEncoder.encode(ADMIN_USER_LOGIN),
                 List.of(),
                 UserRole.ADMIN,
                 false,

@@ -9,12 +9,14 @@ import com.puzzlemaker.model.User;
 import com.puzzlemaker.repository.GameRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalDouble;
 
 @Slf4j
 @Service
@@ -73,7 +75,7 @@ public class GameService {
                 gameData
         );
 
-        if (gameRepository.findGamesByUserId(testUserId).size() == 0) {
+        if (gameRepository.findGamesByUserId(testUserId).isEmpty()) {
             log.info("The test user does not have any games, adding a test game.");
             gameRepository.insert(game);
             userService.addGameToUsersCollection(testUserId, game.getId());
@@ -89,6 +91,60 @@ public class GameService {
         }
 
         return Optional.of(List.of(activeGameService.createActiveGame(game.orElseThrow())));
+    }
+
+    public Optional<String> rateGameById(String gameId, String login, Integer rating) {
+        if (rating < 1 || rating > 5) {
+            log.warn("The rating must be a value between 1 and 5, the current value is {}", rating);
+            return Optional.empty();
+        }
+
+        Optional<Game> gameOptional = gameRepository.findById(gameId);
+
+        if (gameOptional.isEmpty()) {
+            log.warn("There is no game by id {}, cannot rate", gameId);
+            return Optional.empty();
+        }
+
+        Optional<User> userOptional = userService.getUserByLogin(login);
+
+        if (userOptional.isEmpty()) {
+            log.warn("There is no user by login {}, cannot rate", login);
+            return Optional.empty();
+        }
+
+        Game game = gameOptional.orElseThrow(() -> new IllegalStateException("Game not present despite being found."));
+        User user = userOptional.orElseThrow(() -> new IllegalStateException("User not present despite being found."));
+
+        if (user.getScores().stream().map(Pair::getLeft).noneMatch(gameScoreId -> game.getId().equals(gameScoreId))) {
+            log.warn("The provided user {} has not played this game yet, cannot rate", login);
+            return Optional.empty();
+        }
+
+        if (game.getRatings().stream().map(Pair::getLeft).anyMatch(userId -> user.getId().equals(userId))) {
+            log.warn("The provided user {} has already rated the game, cannot rate", login);
+            return Optional.empty();
+        }
+
+        game.getRatings().add(Pair.of(user.getId(), rating));
+        return Optional.of(gameRepository.save(game).getId());
+    }
+
+    public Optional<Double> getGameRatings(String gameId) {
+        Optional<Game> gameOptional = gameRepository.findById(gameId);
+
+        if (gameOptional.isEmpty()) {
+            log.warn("There is no game by id {}, cannot rate", gameId);
+            return Optional.empty();
+        }
+
+        Game game = gameOptional.orElseThrow(() -> new IllegalStateException("Game not present despite being found."));
+
+        OptionalDouble average = game.getRatings().stream().map(Pair::getValue).mapToInt(Integer::intValue).average();
+        if (average.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(average.getAsDouble());
     }
 
     public Optional<String> createGame(List<ComparableRecord> gameData, boolean isPublic, String title, String desc) {
