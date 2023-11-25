@@ -22,4 +22,13 @@ public class SecurityUtils {
 
         return loggedInUser.getUsername().equals(userToBeAccessedLogin);
     }
+
+    public static boolean isAdmin(UserDetails loggedInUser) {
+
+        Stream<String> userRoles = loggedInUser.getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority);
+
+        return userRoles.anyMatch(role -> UserRole.ADMIN.name().equals(role));
+    }
 }
