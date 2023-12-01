@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.data.util.Pair;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,7 +31,7 @@ public class ComparableRecord {
             return Pair.of(Map.of(FIELDS_LENGTH_MISMATCH, "true"), false);
         }
 
-        Map<String, String> result = new HashMap<>();
+        Map<String, String> result = new LinkedHashMap<>();
 
         for (int i = 0; i < fields.size(); i++) {
             var comparison = fields.get(i).compareTo(trueValue.getFields().get(i));

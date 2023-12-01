@@ -1,6 +1,7 @@
 package com.puzzlemaker.controller;
 
 import com.puzzlemaker.comparison.ComparableRecord;
+import com.puzzlemaker.model.dto.GameDTO;
 import com.puzzlemaker.parsing.CsvFileParser;
 import com.puzzlemaker.service.GameService;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.Optional;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/game")
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
@@ -21,9 +23,21 @@ public class GameController {
     @NotNull
     private final GameService gameService;
 
+    @GetMapping("/get/{id}")
+    public ResponseEntity<GameDTO> get(@PathVariable("id") String id) {
+        Optional<GameDTO> activeGameId = gameService.getGameById(id);
+        return ResponseEntity.of(activeGameId);
+    }
+
+    @GetMapping("/public/getAll")
+    public ResponseEntity<List<GameDTO>> getAll() {
+        Optional<List<GameDTO>> activeGameId = Optional.ofNullable(gameService.getAllPublicGameDtos());
+        return ResponseEntity.of(activeGameId);
+    }
+
     @GetMapping("/{id}/play")
-    public ResponseEntity<List<String>> play(@PathVariable("id") String id) {
-        Optional<List<String>> activeGameId = gameService.playGameById(id);
+    public ResponseEntity<String> play(@PathVariable("id") String id) {
+        Optional<String> activeGameId = gameService.playGameById(id);
         return ResponseEntity.of(activeGameId);
     }
 

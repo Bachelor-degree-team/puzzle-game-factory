@@ -5,6 +5,7 @@ import com.puzzlemaker.model.ActiveGame;
 import com.puzzlemaker.model.Game;
 import lombok.experimental.UtilityClass;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -12,7 +13,9 @@ import java.util.Random;
 public class ActiveGameFactory {
 
     public static ActiveGame fromGame(Game game) {
-        ComparableRecord correctGuess = getRandomElement(game.getGameData());
+        List<ComparableRecord> listCopy = new ArrayList<>(game.getGameData());
+        listCopy.remove(0);
+        ComparableRecord correctGuess = getRandomElement(listCopy);
 
         return new ActiveGame(
                 game.getTitle(),

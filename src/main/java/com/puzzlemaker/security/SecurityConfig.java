@@ -31,7 +31,7 @@ public class SecurityConfig {
         http
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(authorize -> {
-                authorize.requestMatchers("/register", "/ping").permitAll();
+                authorize.requestMatchers("/register", "/ping", "/game/**").permitAll();
                 authorize.anyRequest().authenticated();
             })
             .httpBasic(Customizer.withDefaults())

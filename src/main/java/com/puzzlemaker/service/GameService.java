@@ -6,6 +6,7 @@ import com.puzzlemaker.comparison.fields.ComparableInteger;
 import com.puzzlemaker.comparison.fields.ComparableString;
 import com.puzzlemaker.model.Game;
 import com.puzzlemaker.model.User;
+import com.puzzlemaker.model.dto.GameDTO;
 import com.puzzlemaker.repository.GameRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -82,7 +83,19 @@ public class GameService {
         }
     }
 
-    public Optional<List<String>> playGameById(String gameId) {
+    public Optional<GameDTO> getGameById(String gameId) {
+        return gameRepository.findById(gameId).map(GameDTO::fromGame);
+    }
+
+    public List<GameDTO> getAllPublicGameDtos() {
+        return gameRepository.findAll()
+                .stream()
+                .filter(Game::isPublic)
+                .map(GameDTO::fromGame)
+                .toList();
+    }
+
+    public Optional<String> playGameById(String gameId) {
         Optional<Game> game = gameRepository.findById(gameId);
 
         if (game.isEmpty()) {
@@ -90,7 +103,7 @@ public class GameService {
             return Optional.empty();
         }
 
-        return Optional.of(List.of(activeGameService.createActiveGame(game.orElseThrow())));
+        return Optional.of(activeGameService.createActiveGame(game.orElseThrow()));
     }
 
     public Optional<String> rateGameById(String gameId, String login, Integer rating) {
