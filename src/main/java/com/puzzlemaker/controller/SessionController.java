@@ -28,4 +28,10 @@ public class SessionController {
         return ResponseEntity.of(session);
     }
 
+    @GetMapping("/remove/{id}")
+    public ResponseEntity<Boolean> remove(@PathVariable("id") String id) {
+        sessionService.removeSessionById(id);
+        return ResponseEntity.of(Optional.of(true));
+    }
+
 }

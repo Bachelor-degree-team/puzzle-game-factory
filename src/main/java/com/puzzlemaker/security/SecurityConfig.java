@@ -33,7 +33,7 @@ public class SecurityConfig {
         http
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(authorize -> {
-                authorize.requestMatchers("/register", "/ping", "/game/**", "/user/login", "user/logged").permitAll();
+                authorize.requestMatchers("/register", "/ping", "/game/**", "/user/**", "/session/**").permitAll();
                 authorize.anyRequest().authenticated();
             })
             .httpBasic(Customizer.withDefaults())

@@ -26,4 +26,8 @@ public class SessionService {
         return sessionRepository.findById(id);
     }
 
+    public void removeSessionById(String id) {
+        sessionRepository.deleteById(id);
+    }
+
 }

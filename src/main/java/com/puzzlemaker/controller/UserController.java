@@ -1,6 +1,9 @@
 package com.puzzlemaker.controller;
 
+import com.puzzlemaker.model.Session;
 import com.puzzlemaker.model.User;
+import com.puzzlemaker.model.dto.GameListDTO;
+import com.puzzlemaker.model.dto.UserDTO;
 import com.puzzlemaker.security.SecurityUtils;
 import com.puzzlemaker.service.SessionService;
 import com.puzzlemaker.service.UserService;
@@ -46,10 +49,11 @@ public class UserController {
         return ResponseEntity.of(Optional.of(List.of("false")));
     }
 
-    @GetMapping("/logged")
-    public ResponseEntity<String> getLoggedInUser(@AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.of(Optional.ofNullable(userDetails.getUsername()));
+    @GetMapping("/logged/{session}")
+    public ResponseEntity<UserDTO> getLoggedInUser(@PathVariable("session") String session) {
+        return ResponseEntity.of(Optional.of(UserDTO.fromUser(userService.getUserByLogin(sessionService.getSessionById(session).orElseThrow().getUserLogin()).orElseThrow())));
     }
+
 
     @GetMapping("/{login}/games")
     public ResponseEntity<List<String>> getGameIds(@PathVariable("login") String login, @AuthenticationPrincipal UserDetails userDetails) {
@@ -73,14 +77,11 @@ public class UserController {
         return ResponseEntity.of(result);
     }
 
-    @PostMapping("/{login}/scores/{gameId}/add/{score}")
-    public ResponseEntity<String> addScore(@PathVariable("login") String login,
+    @GetMapping("/{session}/scores/{gameId}/add/{score}")
+    public ResponseEntity<String> addScore(@PathVariable("session") String session,
                                            @PathVariable("gameId") String gameId,
-                                           @PathVariable("score") Integer score,
-                                           @AuthenticationPrincipal UserDetails userDetails) {
-        if (!SecurityUtils.hasAccess(userDetails, login)) {
-            return ResponseEntity.notFound().build();
-        }
+                                           @PathVariable("score") Integer score) {
+        String login = sessionService.getSessionById(session).map(Session::getUserLogin).orElseThrow();
 
         boolean result = userService.addScoreToUser(login, gameId, score);
         return result ? ResponseEntity.ok().build() : ResponseEntity.badRequest().body("Wrong score (must be integer and more than 0)");
