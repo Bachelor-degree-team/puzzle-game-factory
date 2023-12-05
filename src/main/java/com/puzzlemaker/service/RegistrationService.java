@@ -20,14 +20,14 @@ public class RegistrationService {
     @NotNull
     private final BCryptPasswordEncoder passwordEncoder;
 
-    public String register(@NonNull RegistrationRequest request) {
+    public Boolean register(@NonNull RegistrationRequest request) {
         if (userService.getUserByLogin(request.login()).isPresent()) {
-            return "Username already taken! Please choose another username.";
+            return false;
         }
 
         User userToBeAdded = UserFactory.fromRequest(request);
         userToBeAdded.setPassword(passwordEncoder.encode(userToBeAdded.getPassword()));
-        return userService.addUser(userToBeAdded).getId();
+        return userService.addUser(userToBeAdded).getId() != null;
     }
 
 }

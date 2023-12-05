@@ -5,7 +5,11 @@ import com.puzzlemaker.comparison.fields.ComparableDouble;
 import com.puzzlemaker.comparison.fields.ComparableInteger;
 import com.puzzlemaker.comparison.fields.ComparableString;
 import com.puzzlemaker.model.Game;
+import com.puzzlemaker.model.Session;
 import com.puzzlemaker.model.User;
+import com.puzzlemaker.model.dto.GameDTO;
+import com.puzzlemaker.model.dto.GameListDTO;
+import com.puzzlemaker.model.dto.UserDTO;
 import com.puzzlemaker.repository.GameRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +32,9 @@ public class GameService {
 
     @NotNull
     private final UserService userService;
+
+    @NotNull
+    private final SessionService sessionService;
 
     @NotNull
     private final ActiveGameService activeGameService;
@@ -82,7 +89,29 @@ public class GameService {
         }
     }
 
-    public Optional<List<String>> playGameById(String gameId) {
+    public Optional<GameDTO> getGameById(String gameId) {
+        return gameRepository.findById(gameId).map(GameDTO::fromGame);
+    }
+
+    public Optional<Game> getGameObjectById(String gameId) {
+        return gameRepository.findById(gameId);
+    }
+
+    public List<GameDTO> getAllPublicGameDtos() {
+        return gameRepository.findAll()
+                .stream()
+                .filter(Game::isPublic)
+                .map(GameDTO::fromGame)
+                .toList();
+    }
+
+    public Optional<List<GameListDTO>> getGameList(String login) {
+        List<String> ids = userService.getUserByLogin(login).map(User::getGamesIds).orElseThrow();
+
+        return Optional.of(ids.stream().map(this::getGameObjectById).map(Optional::get).map(GameListDTO::fromGame).toList());
+    }
+
+    public Optional<String> playGameById(String gameId) {
         Optional<Game> game = gameRepository.findById(gameId);
 
         if (game.isEmpty()) {
@@ -90,10 +119,10 @@ public class GameService {
             return Optional.empty();
         }
 
-        return Optional.of(List.of(activeGameService.createActiveGame(game.orElseThrow())));
+        return Optional.of(activeGameService.createActiveGame(game.orElseThrow()));
     }
 
-    public Optional<String> rateGameById(String gameId, String login, Integer rating) {
+    public Optional<String> rateGameById(String gameId, String session, Integer rating) {
         if (rating < 1 || rating > 5) {
             log.warn("The rating must be a value between 1 and 5, the current value is {}", rating);
             return Optional.empty();
@@ -105,7 +134,7 @@ public class GameService {
             log.warn("There is no game by id {}, cannot rate", gameId);
             return Optional.empty();
         }
-
+        String login = sessionService.getSessionById(session).orElseThrow().getUserLogin();
         Optional<User> userOptional = userService.getUserByLogin(login);
 
         if (userOptional.isEmpty()) {
@@ -147,16 +176,19 @@ public class GameService {
         return Optional.of(average.getAsDouble());
     }
 
-    public Optional<String> createGame(List<ComparableRecord> gameData, boolean isPublic, String title, String desc) {
-        Optional<String> userLogin = userService.getLoggedInUserId();
+    public Optional<String> createGame(List<ComparableRecord> gameData, boolean isPublic, String title, String desc, String session) {
+        Optional<String> userId = sessionService.getSessionById(session)
+                .map(Session::getUserLogin)
+                .flatMap(userService::getUserByLogin)
+                .map(User::getId);
 
-        if (userLogin.isEmpty()) {
+        if (userId.isEmpty()) {
             return Optional.empty();
         }
 
         Game newGame = new Game(
                 isPublic,
-                userLogin.orElseThrow(() -> new IllegalStateException("No username is present despite being found.")),
+                userId.orElseThrow(() -> new IllegalStateException("No username is present despite being found.")),
                 title,
                 desc,
                 gameData

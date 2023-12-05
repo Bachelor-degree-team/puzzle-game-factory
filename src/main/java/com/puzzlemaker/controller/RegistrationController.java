@@ -4,11 +4,12 @@ import com.puzzlemaker.service.RegistrationService;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
+@CrossOrigin
 @RestController
 @RequestMapping("/register")
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
@@ -18,7 +19,7 @@ public class RegistrationController {
     private final RegistrationService registrationService;
 
     @PostMapping
-    public String register(@RequestBody RegistrationRequest request) {
-        return registrationService.register(request);
+    public ResponseEntity<Boolean> register(@RequestBody RegistrationRequest request) {
+        return ResponseEntity.of(Optional.of(registrationService.register(request)));
     }
 }
