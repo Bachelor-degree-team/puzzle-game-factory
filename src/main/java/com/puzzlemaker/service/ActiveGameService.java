@@ -79,6 +79,7 @@ public class ActiveGameService {
         AtomicInteger i = new AtomicInteger();
         guessAndMatch.forEach((key, value) -> {
             if (key.equals("game_won")) {
+                result.put("game_won", List.of(value));
                 return;
             }
             result.put(columns.get(i.get()), List.of(key, value));
