@@ -1,5 +1,13 @@
 version: "3.8"
 services:
+  application:
+    image: spring-app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongodb
+      - mongo-express
+    container_name: spring-application
   mongodb:
     image: mongo
     container_name: mongodb
@@ -10,6 +18,8 @@ services:
     environment:
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=admin
+    expose:
+      - "27017"
   mongo-express:
     image: mongo-express
     container_name: mongo-express

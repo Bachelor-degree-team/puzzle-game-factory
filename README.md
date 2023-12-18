@@ -14,11 +14,18 @@ Ports occupied (Make sure these are free at the time of startup)
 - MongoDB: 27017
 - Mongo Express: 8081
 
+Mongo Express can be accessed on 0.0.0.0:8081
 The database part of the application is containerized using docker compose.
 
 Both docker engine and docker compose are recommended for easy application startup, but they are not required. The MongoDB instance can be initiated manually, as long as the credentials and authentication database names match the ones in [application properties file](src/main/resources/application.properties)
 
 Instantiating Mongo Express is optional, if you wish to manage MongoDB via terminal, simply remove (or comment out) the mongo-express container from the [docker compose file](docker-compose.yaml)
+
+Before running the application make sure to adjust application properties in src/main/resources folder
+to match your running preferences since. Moreover, when starting application from the terminal remove 
+spring-app from the list of services in docker compose file.
+
+
 
 #### Linux
 1. Install docker engine and docker compose ([engine docs](https://docs.docker.com/engine/install/ubuntu/), [compose docs](https://docs.docker.com/compose/install/linux/))
