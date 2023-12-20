@@ -4,6 +4,7 @@ import com.puzzlemaker.comparison.ComparableField;
 import com.puzzlemaker.comparison.ComparableRecord;
 import com.puzzlemaker.model.ActiveGame;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public record ActiveGameDTO (
@@ -34,6 +35,8 @@ public record ActiveGameDTO (
     }
 
     private static List<String> allGuesses(List<ComparableRecord> gameData) {
-        return gameData.stream().map(ComparableRecord::getName).toList();
+        List<String> nameColumnValues = new ArrayList<>(gameData.stream().map(ComparableRecord::getName).toList());
+        nameColumnValues.remove(nameColumnValues.get(0));
+        return nameColumnValues;
     }
 }

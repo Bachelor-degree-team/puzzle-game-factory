@@ -13,19 +13,20 @@ import com.puzzlemaker.model.dto.UserDTO;
 import com.puzzlemaker.repository.GameRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.OptionalDouble;
+import java.util.*;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class GameService {
+
+    private static final String EXAMPLE_GAME_TITLE = "Example Game";
 
     @NotNull
     private final GameRepository gameRepository;
@@ -87,6 +88,187 @@ public class GameService {
             gameRepository.insert(game);
             userService.addGameToUsersCollection(testUserId, game.getId());
         }
+
+        populateExampleAdminGame();
+    }
+
+    public void populateExampleAdminGame() {
+
+        String adminUserId = userService.getAdminUser()
+                .map(User::getId)
+                .orElseThrow(() -> new RuntimeException("No admin user present while populating the database"));
+
+        ComparableRecord record0 = new ComparableRecord(
+                "name",
+                List.of(
+                        new ComparableString("Type"),
+                        new ComparableString("Subtype"),
+                        new ComparableString("Dominant Color"),
+                        new ComparableString("Mass (KG)"),
+                        new ComparableString("Lifespan (Yrs)")
+                )
+        );
+
+        ComparableRecord record1 = new ComparableRecord(
+                "Human",
+                List.of(
+                        new ComparableString("Animal"),
+                        new ComparableString("Mammal"),
+                        new ComparableString("Milk coffee"),
+                        new ComparableDouble(70.0),
+                        new ComparableInteger(80)
+                )
+        );
+
+        ComparableRecord record2 = new ComparableRecord(
+                "Woolly Mammoth",
+                List.of(
+                        new ComparableString("Animal"),
+                        new ComparableString("Mammal"),
+                        new ComparableString("Brown"),
+                        new ComparableDouble(5000.0),
+                        new ComparableInteger(60)
+                )
+        );
+
+        ComparableRecord record3 = new ComparableRecord(
+                "Rat",
+                List.of(
+                        new ComparableString("Animal"),
+                        new ComparableString("Mammal"),
+                        new ComparableString("Gray"),
+                        new ComparableDouble(0.2),
+                        new ComparableInteger(3)
+                )
+        );
+
+        ComparableRecord record4 = new ComparableRecord(
+                "Crocodile",
+                List.of(
+                        new ComparableString("Animal"),
+                        new ComparableString("Reptile"),
+                        new ComparableString("Green"),
+                        new ComparableDouble(1250.0),
+                        new ComparableInteger(60)
+                )
+        );
+
+        ComparableRecord record5 = new ComparableRecord(
+                "Chameleon",
+                List.of(
+                        new ComparableString("Animal"),
+                        new ComparableString("Reptile"),
+                        new ComparableString("Changes color"),
+                        new ComparableDouble(0.2),
+                        new ComparableInteger(5)
+                )
+        );
+
+        ComparableRecord record6 = new ComparableRecord(
+                "Oak",
+                List.of(
+                        new ComparableString("Plant"),
+                        new ComparableString("Tree"),
+                        new ComparableString("Brown"),
+                        new ComparableDouble(10000.0),
+                        new ComparableInteger(600)
+                )
+        );
+
+        ComparableRecord record7 = new ComparableRecord(
+                "Birch",
+                List.of(
+                        new ComparableString("Plant"),
+                        new ComparableString("Tree"),
+                        new ComparableString("White"),
+                        new ComparableDouble(1000.0),
+                        new ComparableInteger(100)
+                )
+        );
+
+        ComparableRecord record8 = new ComparableRecord(
+                "Tulip",
+                List.of(
+                        new ComparableString("Plant"),
+                        new ComparableString("Flower"),
+                        new ComparableString("Many colors"),
+                        new ComparableDouble(0.035),
+                        new ComparableInteger(2)
+                )
+        );
+
+        ComparableRecord record9 = new ComparableRecord(
+                "Daisy",
+                List.of(
+                        new ComparableString("Plant"),
+                        new ComparableString("Flower"),
+                        new ComparableString("White"),
+                        new ComparableDouble(0.025),
+                        new ComparableInteger(0)
+                )
+        );
+
+        ComparableRecord record10 = new ComparableRecord(
+                "Rose",
+                List.of(
+                        new ComparableString("Plant"),
+                        new ComparableString("Flower"),
+                        new ComparableString("Red"),
+                        new ComparableDouble(0.05),
+                        new ComparableInteger(7)
+                )
+        );
+
+        List<ComparableRecord> gameData = List.of(
+                record0,
+                record1,
+                record2,
+                record3,
+                record4,
+                record5,
+                record6,
+                record7,
+                record8,
+                record9,
+                record10
+        );
+
+        Game game = new Game(
+                false,
+                adminUserId,
+                EXAMPLE_GAME_TITLE,
+                "Guess out of 10 well known living beings. Observe how the game progresses and make educated guesses based on previous answers!",
+                gameData
+        );
+
+        if (gameRepository.findGamesByUserId(adminUserId).isEmpty()) {
+            log.info("The admin user does not have any games, adding the example game.");
+            gameRepository.insert(game);
+            userService.addGameToUsersCollection(adminUserId, game.getId());
+        }
+    }
+
+    public Optional<String> getExampleGameId() {
+        String adminUserId = userService.getAdminUser()
+                .map(User::getId)
+                .orElseThrow(() -> new RuntimeException("No admin user present while fetching example game"));
+
+        return gameRepository.findGamesByUserId(adminUserId)
+                .stream()
+                .filter(game -> EXAMPLE_GAME_TITLE.equals(game.getTitle()))
+                .map(Game::getId)
+                .findFirst();
+    }
+
+    public Optional<String> getRandomGameId() {
+        List<String> allIds = gameRepository.findAll().stream().filter(Game::isPublic).map(Game::getId).toList();
+
+        if (CollectionUtils.isEmpty(allIds)) {
+            return Optional.empty();
+        }
+
+        int randomIndex = new Random().nextInt(allIds.size());
+        return Optional.of(allIds.get(randomIndex));
     }
 
     public Optional<GameDTO> getGameById(String gameId) {
@@ -102,6 +284,7 @@ public class GameService {
                 .stream()
                 .filter(Game::isPublic)
                 .map(GameDTO::fromGame)
+                .sorted(Comparator.comparing(GameDTO::rating).reversed())
                 .toList();
     }
 

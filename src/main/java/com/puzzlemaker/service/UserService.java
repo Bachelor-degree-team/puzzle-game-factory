@@ -2,6 +2,8 @@ package com.puzzlemaker.service;
 
 import com.puzzlemaker.model.User;
 import com.puzzlemaker.model.UserRole;
+import com.puzzlemaker.model.dto.GameHistoryDTO;
+import com.puzzlemaker.repository.GameRepository;
 import com.puzzlemaker.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +34,9 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
 
     @NotNull
+    private final GameRepository gameRepository;
+
+    @NotNull
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Override
@@ -54,6 +59,22 @@ public class UserService implements UserDetailsService {
                 () -> log.warn("The user by the login {} does not exist, cannot add a score", login)
         );
         return true;
+    }
+
+    public Optional<List<GameHistoryDTO>> getScores(String login) {
+        Optional<User> userOptional = getUserByLogin(login);
+
+        if (userOptional.isEmpty()) {
+            return Optional.empty();
+        }
+
+        User user = userOptional.orElseThrow(() -> new IllegalStateException("No user present despite being found."));
+
+        return Optional.of(user.getScores().stream().map(pair -> new GameHistoryDTO(
+                gameRepository.findById(pair.getLeft()).orElseThrow().getTitle(),
+                pair.getRight(),
+                pair.getLeft()
+        )).toList());
     }
 
     public void populate() {
@@ -139,7 +160,7 @@ public class UserService implements UserDetailsService {
         return userRepository.findUserByLogin(TEST_USER_LOGIN);
     }
 
-    private Optional<User> getAdminUser() {
+    public Optional<User> getAdminUser() {
         return userRepository.findUserByLogin(ADMIN_USER_LOGIN);
     }
 
