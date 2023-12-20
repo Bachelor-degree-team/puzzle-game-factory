@@ -23,7 +23,17 @@ public class CsvFileParser {
 
     private static final int FIRST_ITEM = 0;
 
-    public static List<ComparableRecord> readCsvFromRequest(MultipartFile file, char separator) {
+    public static List<String[]> readCsvToArrays(MultipartFile file, char separator) {
+
+        try (CSVReader reader = new CSVReader(new InputStreamReader(file.getInputStream()), separator)) {
+            return reader.readAll();
+        } catch (IOException ioe) {
+            throw new RuntimeException("Failed reading csv file contents: ", ioe);
+        }
+
+    }
+
+    public static List<ComparableRecord> readCsvToGameData(MultipartFile file, char separator) {
 
         try (CSVReader reader = new CSVReader(new InputStreamReader(file.getInputStream()), separator)) {
             List<String[]> rows = reader.readAll();

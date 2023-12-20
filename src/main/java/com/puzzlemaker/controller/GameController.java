@@ -31,6 +31,18 @@ public class GameController {
         return ResponseEntity.of(activeGameId);
     }
 
+    @GetMapping("/get/example")
+    public ResponseEntity<String> getExample() {
+        Optional<String> exampleGameId = gameService.getExampleGameId();
+        return ResponseEntity.of(exampleGameId);
+    }
+
+    @GetMapping("/get/random")
+    public ResponseEntity<String> getRandom() {
+        Optional<String> randomGameId = gameService.getRandomGameId();
+        return ResponseEntity.of(randomGameId);
+    }
+
     @GetMapping("/public/getAll")
     public ResponseEntity<List<GameDTO>> getAll() {
         Optional<List<GameDTO>> activeGameId = Optional.ofNullable(gameService.getAllPublicGameDtos());
@@ -69,7 +81,7 @@ public class GameController {
                                          @RequestParam String title,
                                          @RequestParam String desc,
                                          @RequestParam String session) {
-        List<ComparableRecord> gameData = CsvFileParser.readCsvFromRequest(csv, separator);
+        List<ComparableRecord> gameData = CsvFileParser.readCsvToGameData(csv, separator);
         Optional<String> createdGameId = gameService.createGame(gameData, isPublic, title, desc, session);
         return ResponseEntity.of(createdGameId);
     }

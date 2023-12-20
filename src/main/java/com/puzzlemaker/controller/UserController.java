@@ -2,6 +2,7 @@ package com.puzzlemaker.controller;
 
 import com.puzzlemaker.model.Session;
 import com.puzzlemaker.model.User;
+import com.puzzlemaker.model.dto.GameHistoryDTO;
 import com.puzzlemaker.model.dto.GameListDTO;
 import com.puzzlemaker.model.dto.UserDTO;
 import com.puzzlemaker.security.SecurityUtils;
@@ -85,6 +86,14 @@ public class UserController {
 
         boolean result = userService.addScoreToUser(login, gameId, score);
         return result ? ResponseEntity.ok().build() : ResponseEntity.badRequest().body("Wrong score (must be integer and more than 0)");
+    }
+
+    @GetMapping("/{session}/scores/get")
+    public ResponseEntity<List<GameHistoryDTO>> addScore(@PathVariable("session") String session) {
+        String login = sessionService.getSessionById(session).map(Session::getUserLogin).orElseThrow();
+
+        Optional<List<GameHistoryDTO>> result = userService.getScores(login);
+        return ResponseEntity.of(result);
     }
 
 }
