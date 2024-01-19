@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.OptionalDouble;
 
 public record GameListDTO (
+        String id,
         String name,
         boolean isPublic,
         double rating
@@ -14,8 +15,9 @@ public record GameListDTO (
 
     public static GameListDTO fromGame(Game game) {
         return new GameListDTO(
+                game.getId(),
                 game.getTitle(),
-                game.isPublic(),
+                game.getIsPublic(),
                 averageRating(game.getRatings())
         );
     }

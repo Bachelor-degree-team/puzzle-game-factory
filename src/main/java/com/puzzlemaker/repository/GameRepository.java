@@ -13,4 +13,6 @@ public interface GameRepository extends MongoRepository<Game, String> {
     Optional<Game> findGameByUserId(String userId);
 
     List<Game> findGamesByUserId(String userId);
+
+    void deleteGamesByUserId(String userId);
 }
