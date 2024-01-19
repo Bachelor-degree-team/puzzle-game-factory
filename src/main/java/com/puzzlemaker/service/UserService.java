@@ -107,6 +107,23 @@ public class UserService implements UserDetailsService {
         );
     }
 
+    public void removeGameFromUsersCollection(String gameId) {
+        userRepository.findUserByGamesIdsContaining(gameId).ifPresentOrElse(
+                user -> {
+                    user.getGamesIds().remove(gameId);
+                    userRepository.save(user);
+                },
+                () -> log.warn("The user with a game id {} does not exist, cannot remove a game from his collection", gameId)
+        );
+    }
+
+    public void removeUserById(String id) {
+        getUserById(id).ifPresent(user -> {
+            gameRepository.deleteGamesByUserId(id);
+            userRepository.delete(user);
+        });
+    }
+
     public Optional<User> getUserById(String id) {
         return userRepository.findById(id);
     }
@@ -134,11 +151,11 @@ public class UserService implements UserDetailsService {
                 .map(User::getId);
     }
 
-    public Optional<String> setUserLocked(String login, Boolean locked) {
-        Optional<User> userOptional = getUserByLogin(login);
+    public Optional<String> setUserLocked(String id, Boolean locked) {
+        Optional<User> userOptional = getUserById(id);
 
         if (userOptional.isEmpty()) {
-            log.warn("There is no user by login {}, cannot block", login);
+            log.warn("There is no user by id {}, cannot block", id);
             return Optional.empty();
         }
 

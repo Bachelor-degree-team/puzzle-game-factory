@@ -261,7 +261,7 @@ public class GameService {
     }
 
     public Optional<String> getRandomGameId() {
-        List<String> allIds = gameRepository.findAll().stream().filter(Game::isPublic).map(Game::getId).toList();
+        List<String> allIds = gameRepository.findAll().stream().filter(Game::getIsPublic).map(Game::getId).toList();
 
         if (CollectionUtils.isEmpty(allIds)) {
             return Optional.empty();
@@ -275,6 +275,20 @@ public class GameService {
         return gameRepository.findById(gameId).map(GameDTO::fromGame);
     }
 
+    public Optional<Boolean> removeGameById(String gameId) {
+        gameRepository.deleteById(gameId);
+        userService.removeGameFromUsersCollection(gameId);
+        return Optional.of(true);
+    }
+
+    public Optional<Boolean> changeVisibility(String gameId) {
+        gameRepository.findById(gameId).ifPresent(game -> {
+            game.setIsPublic(!game.getIsPublic());
+            gameRepository.save(game);
+        });
+        return Optional.of(true);
+    }
+
     public Optional<Game> getGameObjectById(String gameId) {
         return gameRepository.findById(gameId);
     }
@@ -282,9 +296,16 @@ public class GameService {
     public List<GameDTO> getAllPublicGameDtos() {
         return gameRepository.findAll()
                 .stream()
-                .filter(Game::isPublic)
+                .filter(Game::getIsPublic)
                 .map(GameDTO::fromGame)
                 .sorted(Comparator.comparing(GameDTO::rating).reversed())
+                .toList();
+    }
+
+    public List<GameDTO> getAllGameDtos() {
+        return gameRepository.findAll()
+                .stream()
+                .map(GameDTO::fromGame)
                 .toList();
     }
 
@@ -334,8 +355,11 @@ public class GameService {
         }
 
         if (game.getRatings().stream().map(Pair::getLeft).anyMatch(userId -> user.getId().equals(userId))) {
-            log.warn("The provided user {} has already rated the game, cannot rate", login);
-            return Optional.empty();
+            log.warn("The provided user {} has already rated the game, will swap rating", login);
+            Optional<Pair<String, Integer>> existingRating =  game.getRatings().stream().filter(existingRatingz -> user.getId().equals(existingRatingz.getLeft())).findFirst();
+            existingRating.ifPresent(ratingToRemove -> {
+                game.getRatings().remove(ratingToRemove);
+            });
         }
 
         game.getRatings().add(Pair.of(user.getId(), rating));

@@ -16,7 +16,8 @@ public class Game {
     @Id
     private String id;
 
-    private final boolean isPublic;
+    @NotNull
+    private Boolean isPublic;
 
     private List<Pair<String, Integer>> ratings = List.of();
 

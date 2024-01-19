@@ -1,7 +1,6 @@
 package com.puzzlemaker.controller;
 
 import com.puzzlemaker.comparison.ComparableRecord;
-import com.puzzlemaker.model.User;
 import com.puzzlemaker.model.dto.GameDTO;
 import com.puzzlemaker.model.dto.GameListDTO;
 import com.puzzlemaker.parsing.CsvFileParser;
@@ -31,6 +30,18 @@ public class GameController {
         return ResponseEntity.of(activeGameId);
     }
 
+    @GetMapping("/remove/{id}")
+    public ResponseEntity<Boolean> remove(@PathVariable("id") String id) {
+        Optional<Boolean> gameRemoved = gameService.removeGameById(id);
+        return ResponseEntity.of(gameRemoved);
+    }
+
+    @GetMapping("/visibility/{id}")
+    public ResponseEntity<Boolean> changeVisibility(@PathVariable("id") String id) {
+        Optional<Boolean> gameRemoved = gameService.changeVisibility(id);
+        return ResponseEntity.of(gameRemoved);
+    }
+
     @GetMapping("/get/example")
     public ResponseEntity<String> getExample() {
         Optional<String> exampleGameId = gameService.getExampleGameId();
@@ -46,6 +57,12 @@ public class GameController {
     @GetMapping("/public/getAll")
     public ResponseEntity<List<GameDTO>> getAll() {
         Optional<List<GameDTO>> activeGameId = Optional.ofNullable(gameService.getAllPublicGameDtos());
+        return ResponseEntity.of(activeGameId);
+    }
+
+    @GetMapping("/admin/getAll")
+    public ResponseEntity<List<GameDTO>> getAllAdmin() {
+        Optional<List<GameDTO>> activeGameId = Optional.ofNullable(gameService.getAllGameDtos());
         return ResponseEntity.of(activeGameId);
     }
 

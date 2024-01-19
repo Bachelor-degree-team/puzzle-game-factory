@@ -5,15 +5,16 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public record UserDTO(
+        String id,
         String login,
         List<List<String>> scores
 ) {
 
     public static UserDTO fromUser(User user) {
         return new UserDTO(
+                user.getId(),
                 user.getLogin(),
                 transformScores(user.getScores())
         );
