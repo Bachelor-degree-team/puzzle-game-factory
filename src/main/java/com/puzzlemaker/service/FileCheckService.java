@@ -23,9 +23,9 @@ public class FileCheckService {
 
     private static final List<String> FOUL_WORDS = List.of("fuck", "nigger", "cunt", "nigga", "bitch", "shit");
 
-    public FileCheckDTO checkFile(MultipartFile csvFile) {
-        List<String[]> rowData = CsvFileParser.readCsvToArrays(csvFile, ',');
-        List<ComparableRecord> gameData = CsvFileParser.readCsvToGameData(csvFile, ',');
+    public FileCheckDTO checkFile(MultipartFile csvFile, char separator) {
+        List<String[]> rowData = CsvFileParser.readCsvToArrays(csvFile, separator);
+        List<ComparableRecord> gameData = CsvFileParser.readCsvToGameData(csvFile, separator);
 
         return FileCheckDTO.fromConditions(
                 foulLanguage(rowData),
