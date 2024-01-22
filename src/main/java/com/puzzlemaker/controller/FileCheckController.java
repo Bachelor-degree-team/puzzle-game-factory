@@ -22,8 +22,8 @@ public class FileCheckController {
     private final FileCheckService fileCheckService;
 
     @PostMapping("/check")
-    public ResponseEntity<FileCheckDTO> check(@RequestParam MultipartFile csv) {
-        FileCheckDTO fileCheckDTO = fileCheckService.checkFile(csv);
+    public ResponseEntity<FileCheckDTO> check(@RequestParam MultipartFile csv, @RequestParam char separator) {
+        FileCheckDTO fileCheckDTO = fileCheckService.checkFile(csv, separator);
         return ResponseEntity.of(Optional.of(fileCheckDTO));
     }
 

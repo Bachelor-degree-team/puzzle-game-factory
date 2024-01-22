@@ -5,6 +5,7 @@ import com.puzzlemaker.comparison.ComparableField;
 import com.puzzlemaker.comparison.ComparableRecord;
 import com.puzzlemaker.comparison.fields.ComparableDouble;
 import com.puzzlemaker.comparison.fields.ComparableInteger;
+import com.puzzlemaker.comparison.fields.ComparableList;
 import com.puzzlemaker.comparison.fields.ComparableString;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -70,6 +72,10 @@ public class CsvFileParser {
     }
 
     private static ComparableField<?> toComparableField(String value) {
+        if (value.startsWith("[") && value.endsWith("]")) {
+            return parseList(value);
+        }
+
         if (!NumberUtils.isCreatable(value)) {
             log.debug("Value not numeric - casting to string.");
             return new ComparableString(value);
@@ -92,6 +98,17 @@ public class CsvFileParser {
 
         log.error("Read value was not matched to any of the primitive types, aborting!");
         throw new IllegalArgumentException("No type for value matched.");
+    }
+
+    private static ComparableList parseList(String value) {
+        String listWithOutBracesAndSpaces = value
+                .replace("[", "")
+                .replace("]", "")
+                .replace(" ", "");
+
+        List<String> list = Arrays.asList(listWithOutBracesAndSpaces.split(","));
+
+        return new ComparableList(list);
     }
 
 }
