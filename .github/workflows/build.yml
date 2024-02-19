@@ -7,8 +7,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: gradle/wrapper-validation-action@v1
-      - name: run docker mongodb
-        run: docker-compose up -d mongodb
+      
         
       - name: JDK 17 setup
         uses: actions/setup-java@v2
@@ -19,7 +18,16 @@ jobs:
 
       - name: Clean and Build
         run: ./gradlew clean build --info -x test
+        
+      - name: create docker image for application
+        run: docker build -t sping-app
+        
+      - name: run docker compose
+        run: docker-compose up -d
 
+      - name: stop app container
+        run: docker-compose down spring-app
+        
       - name: Test
         run: ./gradlew test
         
