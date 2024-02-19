@@ -1,3 +1,6 @@
 name,column1,column2,column3
 data1,comp1,6,4.2
-data2,comp4,10,5.0
+data2,comp2,7,4.3
+data3,comp3,8,4.4
+data4,comp4,9,4.5
+data5,comp5,10,4.6

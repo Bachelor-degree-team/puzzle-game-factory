@@ -7,7 +7,7 @@ services:
     depends_on:
       - mongodb
       - mongo-express
-    container_name: spring-application
+    container_name: spring-app
   mongodb:
     image: mongo
     container_name: mongodb
