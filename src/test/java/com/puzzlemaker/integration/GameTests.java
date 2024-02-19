@@ -179,6 +179,36 @@ public class GameTests {
     }
     @Test
     @Order(11)
+    public void makeGameInvisible()throws Exception{
+        Response before = given().get("/game/public/getAll").thenReturn();
+        Assertions.assertEquals(200, before.statusCode());
+        Response response = given().get("/game/visibility/"+createdGameId);
+        Assertions.assertEquals(200, response.statusCode());
+        Assertions.assertEquals("true", response.asString());
+        Response response1 = given().auth().basic(newUserLogin,newUserPassword)
+                .get("/game/get/"+createdGameId).thenReturn();
+        Assertions.assertEquals(200, response1.statusCode());
+        Response after = given().get("/game/public/getAll").thenReturn();
+        Assertions.assertEquals(200, after.statusCode());
+        Assertions.assertEquals((new JSONArray(before.asString()).length()), (new JSONArray(after.asString()).length()+1));
+    }
+    @Test
+    @Order(12)
+    public void makeGameVisible()throws Exception{
+        Response before = given().get("/game/public/getAll").thenReturn();
+        Assertions.assertEquals(200, before.statusCode());
+        Response response = given().get("/game/visibility/"+createdGameId);
+        Assertions.assertEquals(200, response.statusCode());
+        Assertions.assertEquals("true", response.asString());
+        Response response1 = given().auth().basic(newUserLogin,newUserPassword)
+                .get("/game/get/"+createdGameId).thenReturn();
+        Assertions.assertEquals(200, response1.statusCode());
+        Response after = given().get("/game/public/getAll").thenReturn();
+        Assertions.assertEquals(200, after.statusCode());
+        Assertions.assertEquals((new JSONArray(before.asString()).length())+1, (new JSONArray(after.asString()).length()));
+    }
+    @Test
+    @Order(13)
     public void removeGameTest(){
         Response before = given().get("/game/public/getAll").thenReturn();
         Assertions.assertEquals(200, before.statusCode());
@@ -192,7 +222,7 @@ public class GameTests {
 
     }
     @Test
-    @Order(12)
+    @Order(14)
     public void removeUserTest() throws Exception {
         Response responseBefore = given().get("/user/getAll").thenReturn();
         Assertions.assertEquals(200, responseBefore.statusCode());
