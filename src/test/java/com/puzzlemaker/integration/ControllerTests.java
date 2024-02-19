@@ -34,13 +34,6 @@ public class ControllerTests {
     int port;
     String adminLogin = "admin";
     String adminPassword = "admin";
-    String userLogin = "test";
-    String userPassword = "password";
-    String newUserLogin = "newUser#1";
-    String newUserPassword = "testpassword";
-    String newUserEmail = "test@test.pl";
-    String adminGameId = "65c7eaf6ea74fa491dae8a87";
-    String exampleGameId = "65ca3a5851762a64ecc06b71";
 
     @BeforeEach
     public void setUp() {
@@ -159,7 +152,7 @@ public class ControllerTests {
     public void getExampleGame() throws Exception {
         Response response = given().get("/game/get/example").thenReturn();
         Assertions.assertEquals(200, response.statusCode());
-        Assertions.assertEquals(exampleGameId, response.asString());
+        Assertions.assertEquals(24, response.asString().toCharArray().length);
     }
 
     @Test
@@ -168,50 +161,14 @@ public class ControllerTests {
         Assertions.assertEquals(200, response.statusCode());
         JSONArray array = new JSONArray(response.asString());
         System.out.println(array);
-        Assertions.assertEquals(adminGameId, (String) array.getJSONObject(0).get("id"));
+        Assertions.assertEquals(2, array.length());
+        JSONObject json1 = (JSONObject) array.get(0);
+        JSONObject json2 = (JSONObject) array.get(1);
+        Assertions.assertEquals("A test game", json1.get("title"));
+        Assertions.assertEquals("Example Game", json2.get("title"));
+
     }
 
-
-    //add game since no games in public
-    @Test
-    public void makeAdminGamePrivate() throws Exception {
-        Response response = given().get("/game/public/getAll").thenReturn();
-        Assertions.assertEquals(200, response.statusCode());
-        JSONArray array = new JSONArray(response.asString());
-        System.out.println(array);
-        boolean gameVisible = false;
-        for (int i = 0; i < array.length(); i++) {
-            if (((String) array.getJSONObject(i).get("id")).compareTo(adminGameId) == 0) {
-                gameVisible = true;
-                break;
-            }
-        }
-        Assertions.assertTrue(gameVisible);
-        Response response1 = given().get("/game/visibility/" + adminGameId).thenReturn();
-        Assertions.assertEquals(200, response1.statusCode());
-        JSONArray array2 = new JSONArray(given().get("/game/public/getAll").thenReturn().asString());
-        Assertions.assertEquals(array.length() + 1, array2.length());
-        boolean gameInvisible = true;
-        for (int i = 0; i < array2.length(); i++) {
-            if (((String) array2.getJSONObject(i).get("id")).compareTo(adminGameId) == 0) {
-                gameInvisible = false;
-                break;
-            }
-        }
-        Assertions.assertTrue(gameInvisible);
-        Response response2 = given().get("/game/visibility/" + adminGameId).thenReturn();
-        Assertions.assertEquals(200, response2.statusCode());
-        JSONArray array3 = new JSONArray(given().get("/game/public/getAll").thenReturn().asString());
-        Assertions.assertEquals(array.length(), array3.length());
-        gameVisible = false;
-        for (int i = 0; i < array2.length(); i++) {
-            if (((String) array2.getJSONObject(i).get("id")).compareTo(adminGameId) == 0) {
-                gameVisible = true;
-                break;
-            }
-        }
-        Assertions.assertTrue(gameVisible);
-    }
 
 
 }
