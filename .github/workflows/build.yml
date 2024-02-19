@@ -20,7 +20,7 @@ jobs:
         run: ./gradlew clean build --info -x test
         
       - name: create docker image for application
-        run: docker build -t sping-app
+        run: docker build -t sping-app . 
         
       - name: run docker compose
         run: docker-compose up -d
