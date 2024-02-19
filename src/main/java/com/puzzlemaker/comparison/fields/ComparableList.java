@@ -26,6 +26,7 @@ public class ComparableList implements ComparableField<List<String>> {
         @NotNull
         ComparableList comparableList = ComparisonUtils.ensureList(comparableField);
 
+
         if (value.equals(comparableList.getValue())) {
             return ComparisonResult.MATCH;
         }

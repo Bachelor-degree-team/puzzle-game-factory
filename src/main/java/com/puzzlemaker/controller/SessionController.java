@@ -21,7 +21,6 @@ public class SessionController {
 
     @NotNull
     private final SessionService sessionService;
-
     @GetMapping("/get/{id}")
     public ResponseEntity<Session> get(@PathVariable("id") String id) {
         Optional<Session> session = sessionService.getSessionById(id);

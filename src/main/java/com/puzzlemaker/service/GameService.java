@@ -252,7 +252,6 @@ public class GameService {
         String adminUserId = userService.getAdminUser()
                 .map(User::getId)
                 .orElseThrow(() -> new RuntimeException("No admin user present while fetching example game"));
-
         return gameRepository.findGamesByUserId(adminUserId)
                 .stream()
                 .filter(game -> EXAMPLE_GAME_TITLE.equals(game.getTitle()))

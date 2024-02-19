@@ -1,4 +1,4 @@
-FROM openjdk:17
+FROM openjdk:21
 WORKDIR /usr/app
 COPY ./build/libs/* ./app.jar
 EXPOSE 8080
