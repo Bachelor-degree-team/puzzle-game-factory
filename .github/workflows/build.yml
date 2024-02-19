@@ -19,11 +19,8 @@ jobs:
       - name: Clean and Build
         run: ./gradlew clean build --info -x test
         
-      - name: create docker image for application
-        run: docker build -t sping-app . 
-        
       - name: run docker compose
-        run: docker-compose up -d
+        run: docker-compose up -d --build
 
       - name: stop app container
         run: docker-compose down spring-app
