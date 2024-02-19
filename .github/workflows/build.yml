@@ -24,5 +24,4 @@ jobs:
         run: ./gradlew test
         
       - name: Stop containers
-        if: always
         run:  docker-compose down
