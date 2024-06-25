@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -25,7 +27,11 @@ public class ComparableList implements ComparableField<List<String>> {
 
         @NotNull
         ComparableList comparableList = ComparisonUtils.ensureList(comparableField);
-
+        //sort values for proper matching
+        value = new ArrayList<>(value);
+        value.sort(String::compareTo);
+        comparableList.value = new ArrayList<>(comparableList.value);
+        comparableList.value.sort(String::compareTo);
 
         if (value.equals(comparableList.getValue())) {
             return ComparisonResult.MATCH;

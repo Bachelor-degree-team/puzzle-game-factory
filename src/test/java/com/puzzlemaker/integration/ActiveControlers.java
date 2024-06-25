@@ -8,8 +8,8 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.util.Assert;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -23,7 +23,8 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestPropertySource(properties = {"spring.main.allow-bean-definition-overriding=true", "server.servlet.context-path=/"})
-public class GameTests {
+@ActiveProfiles({"test"})
+public class ActiveControlers {
     @LocalServerPort
     int port;
     String newUserLogin = "newUser#1";
@@ -37,7 +38,7 @@ public class GameTests {
     static String createdUserId;
     static String rating = "3";
 
-    Path correctCSV = Paths.get(System.getProperty("user.dir"), "src", "test", "java", "com", "puzzlemaker",
+    Path correctCSV = Paths.get(System.getProperty("user.dir"), "src", "test",
             "resources", "positive.csv");
 
 
