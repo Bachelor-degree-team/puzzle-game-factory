@@ -25,6 +25,11 @@ Before running the application make sure to adjust application properties in src
 to match your running preferences since. Moreover, when starting application from the terminal remove 
 spring-app from the list of services in docker compose file.
 
+#### Plugins and libraries
+Before adding any code please make sure that you have a following plugins:
+- lombok
+To download all dependencies simply choose one of the following options:\
+1. Go to run options, select gradle run and add dependencies as run option
 
 
 #### Linux

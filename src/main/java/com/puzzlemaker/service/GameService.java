@@ -19,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
 import java.util.*;
 
 @Slf4j
@@ -276,14 +277,20 @@ public class GameService {
 
     public Optional<Boolean> removeGameById(String gameId) {
         gameRepository.deleteById(gameId);
-        userService.removeGameFromUsersCollection(gameId);
+        try {
+            userService.removeGameFromUsersCollection(gameId);
+        } catch (RuntimeException e) {
+            return Optional.of(false);
+        }
         return Optional.of(true);
     }
 
     public Optional<Boolean> changeVisibility(String gameId) {
-        gameRepository.findById(gameId).ifPresent(game -> {
+        gameRepository.findById(gameId).ifPresentOrElse(game -> {
             game.setIsPublic(!game.getIsPublic());
             gameRepository.save(game);
+        }, () -> {
+            throw new RuntimeException("No game of given id");
         });
         return Optional.of(true);
     }
@@ -309,8 +316,7 @@ public class GameService {
     }
 
     public Optional<List<GameListDTO>> getGameList(String login) {
-        List<String> ids = userService.getUserByLogin(login).map(User::getGamesIds).orElseThrow();
-
+        List<String> ids = userService.getUserByLogin(login).map(User::getGamesIds).orElseThrow(() -> new RuntimeException("No such player"));
         return Optional.of(ids.stream().map(this::getGameObjectById).map(Optional::get).map(GameListDTO::fromGame).toList());
     }
 
@@ -337,7 +343,11 @@ public class GameService {
             log.warn("There is no game by id {}, cannot rate", gameId);
             return Optional.empty();
         }
-        String login = sessionService.getSessionById(session).orElseThrow().getUserLogin();
+        Session sessionObject = sessionService.getSessionById(session).orElse(null);
+        if(sessionObject == null){
+            return Optional.empty();
+        }
+        String login = sessionObject.getUserLogin();
         Optional<User> userOptional = userService.getUserByLogin(login);
 
         if (userOptional.isEmpty()) {
@@ -349,16 +359,26 @@ public class GameService {
         User user = userOptional.orElseThrow(() -> new IllegalStateException("User not present despite being found."));
 
         if (user.getScores().stream().map(Pair::getLeft).noneMatch(gameScoreId -> game.getId().equals(gameScoreId))) {
+            System.out.println(game.getId());
+            for(String id : user.getScores().stream().map(Pair::getLeft).toList()){
+                System.out.println(id);
+            }
             log.warn("The provided user {} has not played this game yet, cannot rate", login);
             return Optional.empty();
         }
-
+        System.out.println(user.getUsername());
         if (game.getRatings().stream().map(Pair::getLeft).anyMatch(userId -> user.getId().equals(userId))) {
             log.warn("The provided user {} has already rated the game, will swap rating", login);
-            Optional<Pair<String, Integer>> existingRating =  game.getRatings().stream().filter(existingRatingz -> user.getId().equals(existingRatingz.getLeft())).findFirst();
+            for(String s : game.getRatings().stream().map(Pair::getLeft).toList()){
+                System.out.println(s);
+            }
+            Optional<Pair<String, Integer>> existingRating = game.getRatings().stream().filter(existingRatings -> user.getId().equals(existingRatings.getLeft())).findFirst();
             existingRating.ifPresent(ratingToRemove -> {
                 game.getRatings().remove(ratingToRemove);
             });
+            for(String s : game.getRatings().stream().map(Pair::getLeft).toList()){
+                System.out.println(s);
+            }
         }
 
         game.getRatings().add(Pair.of(user.getId(), rating));
@@ -391,7 +411,6 @@ public class GameService {
         if (userId.isEmpty()) {
             return Optional.empty();
         }
-
         Game newGame = new Game(
                 isPublic,
                 userId.orElseThrow(() -> new IllegalStateException("No username is present despite being found.")),

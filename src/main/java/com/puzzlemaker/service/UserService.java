@@ -113,7 +113,10 @@ public class UserService implements UserDetailsService {
                     user.getGamesIds().remove(gameId);
                     userRepository.save(user);
                 },
-                () -> log.warn("The user with a game id {} does not exist, cannot remove a game from his collection", gameId)
+                () -> {
+                    log.warn("The user with a game id {} does not exist, cannot remove a game from his collection", gameId);
+                    throw new RuntimeException(String.format("No user with id %s exists",gameId));
+                }
         );
     }
 

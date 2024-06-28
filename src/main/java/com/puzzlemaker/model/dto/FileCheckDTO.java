@@ -19,7 +19,7 @@ public record FileCheckDTO (
         return new FileCheckDTO(
                 foul_language,
                 same_size_rows,
-                same_type_columns,
+                same_type_columns && same_size_rows,
                 all_string_first_row,
                 minimum_5,
                 maximum_1000,
