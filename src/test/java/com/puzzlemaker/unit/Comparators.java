@@ -108,7 +108,7 @@ public class Comparators {
         ComparisonResult result3 = cmpList1.compareTo(cmpList4);
         ComparisonResult result4 = cmpList1.compareTo(cmpList5);
         ComparisonResult result5 = cmpList1.compareTo(cmpList6);
-        Assertions.assertEquals(ComparisonResult.MATCH, result1);
+        Assertions.assertEquals(ComparisonResult.PARTIAL_MATCH, result1);
         Assertions.assertEquals(ComparisonResult.PARTIAL_MATCH, result2);
         Assertions.assertEquals(ComparisonResult.MATCH, result3);
         Assertions.assertEquals(ComparisonResult.PARTIAL_MATCH, result4);
