@@ -18,5 +18,11 @@ jobs:
       - name: Clean and Build
         run: ./gradlew clean build --info -x test
 
+      - name: run docker compose
+        run: docker compose up -d
+
       - name: Test
         run: ./gradlew test
+
+      - name: Stop containers
+        run:  docker-compose down
